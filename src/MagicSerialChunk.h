@@ -1,5 +1,5 @@
-#ifndef _SERIALMAGIC_H
-#define _SERIALMAGIC_H
+#ifndef _MAGICSERIALCHUNK_H
+#define _MAGICSERIALCHUNK_H
 
 #define SERMAG_DEBUG
 
@@ -23,7 +23,7 @@
 #define SERIAL_MAGIC_DEFAULT_ENSEQ2 (0xFF-3)
 
 template <class T>
-class SerialMagic {
+class MagicSerialChunk {
 private:
 	uint16_t _chunksize;
 	uint16_t _ctr;
@@ -31,12 +31,12 @@ private:
 
 public:
 	T _ser; // They can access their own object for other calls
-	SerialMagic(T ser,
-	            uint16_t chunksize=SERIAL_MAGIC_DEFAULT_CHUNKSIZE,
-	            uint8_t  stseq1=SERIAL_MAGIC_DEFAULT_STSEQ1,
-	            uint8_t  stseq2=SERIAL_MAGIC_DEFAULT_STSEQ2,
-	            uint8_t  enseq1=SERIAL_MAGIC_DEFAULT_ENSEQ1,
-	            uint8_t  enseq2=SERIAL_MAGIC_DEFAULT_ENSEQ2);
+	MagicSerialChunk(T ser,
+	                 uint16_t chunksize,
+	                 uint8_t  stseq1=SERIAL_MAGIC_DEFAULT_STSEQ1,
+	                 uint8_t  stseq2=SERIAL_MAGIC_DEFAULT_STSEQ2,
+	                 uint8_t  enseq1=SERIAL_MAGIC_DEFAULT_ENSEQ1,
+	                 uint8_t  enseq2=SERIAL_MAGIC_DEFAULT_ENSEQ2);
 	void set_chunk_size(uint16_t newsize);
 	void _send_startseq(void);
 	void _send_endseq(void);
@@ -49,9 +49,9 @@ public:
 	/* void add(float); */
 	/* void add(double); */
     template <class U> void add(U);
-}; // /class SerialMagic
+}; // /class MagicSerialChunk
 
-template <class T> SerialMagic<T>::SerialMagic(T ser,
+template <class T> MagicSerialChunk<T>::MagicSerialChunk(T ser,
                                                uint16_t chunksize,
                                                uint8_t  stseq1,
                                                uint8_t  stseq2,
@@ -66,18 +66,18 @@ template <class T> SerialMagic<T>::SerialMagic(T ser,
 	_enseq2 = enseq2;
 }
 
-template <class T> void SerialMagic<T>::set_chunk_size(uint16_t newsize) {
+template <class T> void MagicSerialChunk<T>::set_chunk_size(uint16_t newsize) {
 	_chunksize = newsize;
 	_ctr = 0;
 }
 
-template <class T> void SerialMagic<T>::_send_startseq(void)
+template <class T> void MagicSerialChunk<T>::_send_startseq(void)
 	{ MDPRINTF("Sending Start Sequence:\n");  _ser.write(_stseq1); _ser.write(_stseq2); }
-template <class T> void SerialMagic<T>::_send_endseq(void)
+template <class T> void MagicSerialChunk<T>::_send_endseq(void)
 	{ MDPRINTF("Sending End Sequence:\n"); _ser.write(_enseq1); _ser.write(_enseq2); }
 
 
-template <class T> void SerialMagic<T>::add(uint8_t c) {
+template <class T> void MagicSerialChunk<T>::add(uint8_t c) {
 	if (!_ctr) _send_startseq();
 	_ctr++;
 	MDPRINTF("Sending a char (%d/%d):\n", _ctr, _chunksize);
@@ -87,34 +87,34 @@ template <class T> void SerialMagic<T>::add(uint8_t c) {
 		_ctr=0;
 	}
 }
-template <class T> void SerialMagic<T>::add(int8_t v) { add((uint8_t)v); }
+template <class T> void MagicSerialChunk<T>::add(int8_t v) { add((uint8_t)v); }
 
 /*
-template <class T> void SerialMagic<T>::add(uint16_t v) {
+template <class T> void MagicSerialChunk<T>::add(uint16_t v) {
 	uint8_t *p = (uint8_t *)&v; add(p[0]); add(p[1]);
 }
-template <class T> void SerialMagic<T>::add(int16_t v) { add((uint16_t)v); }
+template <class T> void MagicSerialChunk<T>::add(int16_t v) { add((uint16_t)v); }
 
 
-template <class T> void SerialMagic<T>::add(uint32_t v) {
+template <class T> void MagicSerialChunk<T>::add(uint32_t v) {
 	uint8_t *p = (uint8_t *)&v; add(p[0]); add(p[1]); add(p[2]); add(p[3]);
 }
-template <class T> void SerialMagic<T>::add(int32_t v) { add((uint32_t)v); }
+template <class T> void MagicSerialChunk<T>::add(int32_t v) { add((uint32_t)v); }
 
-template <class T> void SerialMagic<T>::add(float v) {
+template <class T> void MagicSerialChunk<T>::add(float v) {
 	for (uint8_t i=0; i<sizeof(v); i++)
 		add(((uint8_t *)(&v))[i]);
 }
-template <class T> void SerialMagic<T>::add(double v) {
+template <class T> void MagicSerialChunk<T>::add(double v) {
 	for (uint8_t i=0; i<sizeof(v); i++)
 		add(((uint8_t *)(&v))[i]);
 }
 */
 template <class T>
 template <class U>
-void SerialMagic<T>::add(U v) {
+void MagicSerialChunk<T>::add(U v) {
 	for (uint8_t i=0; i<sizeof(v); i++)
 		add(((uint8_t *)(&v))[i]);
 }
 
-#endif  // _SERIALMAGIC_H
+#endif  // _MAGICSERIALCHUNK_H
