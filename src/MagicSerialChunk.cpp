@@ -7,7 +7,7 @@
 	/* #include <string.h> */
 	/* #include <stdlib.h> */
 #endif
-#define MAGICCHUNK_DEBUG
+/* #define MAGICCHUNK_DEBUG */
 #include "MagicSerialChunk.h"
 
 void serial_chunk_init(struct SerialChunk *sp,
@@ -41,12 +41,10 @@ void _send_endseq(struct SerialChunk *sp) {
 void _serial_chunk_add(struct SerialChunk *sp, uint8_t c) {
 	if (!sp->_ctr) _send_startseq(sp);
 	sp->_ctr++;
-	DSP("Sending a char (");
+	DSP("Sending a char [");
 	DSP(sp->_ctr);
-	DSP('/');
-	DSP(sp->chunksize);
-	DSPL("):");
-	return;
+	DSP('] = ');
+	Serial.println(c);
 	(*sp->_write_cb)(sp, c);
 	if (sp->_ctr >= sp->chunksize) {
 		sp->_send_endseq(sp);
