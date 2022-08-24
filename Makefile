@@ -5,6 +5,6 @@ vi:
 	vim \
 		Makefile \
 		library.properties \
-		src/MagicSerialChunk.c \
+		src/MagicSerialChunk.cpp \
 		src/MagicSerialChunk.h
 
