@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #ifndef _MAGICSERIALCHUNK_H
 #define _MAGICSERIALCHUNK_H
 
@@ -28,8 +29,6 @@
 	#define SER_ENSEQ1 0x03
 	#define SER_ENSEQ2 0xFD
 #endif
-
-
 
 #define SERMAG_DEBUG
 

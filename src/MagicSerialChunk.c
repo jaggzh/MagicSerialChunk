@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #ifdef ARDUINO
 	#include <Arduino.h>
 #else
@@ -27,12 +28,12 @@ void serial_chunk_init(struct SerialChunk *sp,
 }
 
 void _send_startseq(struct SerialChunk *sp) {
-	MDPRINTF("Sending Start Sequence:\n");
+	DSP("Sending Start Sequence:\n");
 	(*sp->_write_cb)(sp, sp->_stseq1);
 	(*sp->_write_cb)(sp, sp->_stseq2);
 }
 void _send_endseq(struct SerialChunk *sp) {
-	MDPRINTF("Sending End Sequence:\n");
+	DSP("Sending End Sequence:\n");
 	(*sp->_write_cb)(sp, sp->_enseq1);
 	(*sp->_write_cb)(sp, sp->_enseq2);
 }
@@ -40,7 +41,12 @@ void _send_endseq(struct SerialChunk *sp) {
 void _serial_chunk_add(struct SerialChunk *sp, uint8_t c) {
 	if (!sp->_ctr) _send_startseq(sp);
 	sp->_ctr++;
-	MDPRINTF("Sending a char (%d/%d):\n", sp->_ctr, sp->chunksize);
+	DSP("Sending a char (");
+	DSP(sp->_ctr);
+	DSP('/');
+	DSP(sp->chunksize);
+	DSPL("):");
+	return;
 	(*sp->_write_cb)(sp, c);
 	if (sp->_ctr >= sp->chunksize) {
 		sp->_send_endseq(sp);
